@@ -28,7 +28,7 @@ def getFile():
     return filePath
 
 def saveTheFile():
-    saveFile('user3')
+    saveFile('user2')
     
 def itemBoxTreeCreator(tab):
     itemBoxTree = ttk.Treeview(tab,column = ('c1','c2','c3'),show='headings', height=5)
