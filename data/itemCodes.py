@@ -1,9 +1,8 @@
 class item:
-    def __init__(self, name, byte1, byte2, quantity = 0):
+    def __init__(self, name, byte1, byte2):
         self.name = name
         self.byte1 = byte1
         self.byte2 = byte2
-        self.quantity = quantity
     
     def printItem(self):
         print(self.name +' '+ str(self.byte1) + str(self.byte2) + ' ' + str(hex(self.byte1)) + str(hex(self.byte2)))
@@ -17,9 +16,6 @@ class item:
     
     def getByte2(self):
         return self.byte2
-    
-    def getQuantity(self):
-        return self.quantity
     
 itemList = {
     (0,0):item('None',0,0),

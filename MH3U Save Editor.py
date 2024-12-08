@@ -27,13 +27,12 @@ def updateListboxTree():
         itemBoxTree.delete(i)
     index = 1 + ((boxIndex-1) *100)
     for i in itemList:
-        itemBoxTree.insert('', 'end', values=(index, i, 'Nash'))
+        itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
         index = index + 1
         
 def itemBoxTreeCreator(tab):
     itemBoxTree = ttk.Treeview(tab,column = ('c1','c2','c3'),show='headings', height=5)
     itemBoxTree.pack(expand=1, fill="both")
-    
     itemBoxTree.column("c1", anchor=tk.CENTER,width=80)
     itemBoxTree.heading("c1", text="Item Number")
     itemBoxTree.column("c2", anchor=tk.W,width=80)
