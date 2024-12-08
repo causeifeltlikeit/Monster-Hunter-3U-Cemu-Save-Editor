@@ -22,14 +22,9 @@ def getFile():
     updateListboxTree()
     return filePath
 
-def updateListboxTree():
-    for i in itemBoxTree.get_children():
-        itemBoxTree.delete(i)
-    index = 1 + ((boxIndex-1) *100)
-    for i in itemList:
-        itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
-        index = index + 1
-        
+def saveTheFile():
+    saveFile('user3')
+    
 def itemBoxTreeCreator(tab):
     itemBoxTree = ttk.Treeview(tab,column = ('c1','c2','c3'),show='headings', height=5)
     itemBoxTree.pack(expand=1, fill="both")
@@ -41,6 +36,20 @@ def itemBoxTreeCreator(tab):
     itemBoxTree.heading("c3", text="Quantity")
     return itemBoxTree
 
+def updateListboxTree():
+    for i in itemBoxTree.get_children():
+        itemBoxTree.delete(i)
+    index = 1 + ((boxIndex-1) *100)
+    for i in itemList:
+        itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
+        index = index + 1
+        
+def modifyItem(a):
+    curItem = itemBoxTree.focus()
+    print(itemBoxTree.item(curItem))
+    itemBoxTree.item(curItem, values=("foo", "bar", 'test'))
+
+
 root = tk.Tk()
 root.title('MH3U Save File Editor')
 
@@ -48,7 +57,9 @@ root.title('MH3U Save File Editor')
 menubar = Menu(root)
 fileMenu = Menu(menubar,tearoff =0)
 menubar.add_cascade(label ='File', menu = fileMenu) 
-fileMenu.add_command(label ='Open Save File', command = getFile) 
+fileMenu.add_command(label ='Open File', command = getFile) 
+fileMenu.add_command(label ='Save File', command = saveTheFile) 
+
 
 #tabs
 notebook = ttk.Notebook(root)
@@ -57,7 +68,7 @@ notebook.add(listBoxTab, text='Item Box')
 notebook.pack(expand=1, fill="both")
 
 itemBoxTree = itemBoxTreeCreator(listBoxTab)
-
+itemBoxTree.bind('<Double-Button-1>', modifyItem)
 
 
 root.config(menu = menubar)
