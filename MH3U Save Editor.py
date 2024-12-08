@@ -33,7 +33,6 @@ menubar = Menu(root)
 fileMenu = Menu(menubar,tearoff =0)
 menubar.add_cascade(label ='File', menu = fileMenu) 
 fileMenu.add_command(label ='Open Save File', command = getFile) 
-fileMenu.add_command(label ='testing', command = printItemList) 
 
 #tabs
 notebook = ttk.Notebook(root)

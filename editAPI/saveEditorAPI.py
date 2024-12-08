@@ -37,15 +37,15 @@ def printItemList(pageNumber):
         offset = offset + 4
     return tempList
 
-def getItemList():
-    return currentItemPage
-        
 def changeItem(itemLocation, itemID, itemQuantity):
     global saveFileData
     offset = itemBoxOffset + (4*itemLocation)
     saveFileData[offset] = itemList[itemID].byte1
     saveFileData[offset + 1] = itemList[itemID].byte2
     saveFileData[offset + 3] = itemQuantity
+
+def getItemList():
+    return currentItemPage
     
 def printZennyAmount():
     print(int.from_bytes(saveFileData[zennyOffset].to_bytes() + saveFileData[zennyOffset + 1].to_bytes() + saveFileData[zennyOffset + 2].to_bytes()))
@@ -57,6 +57,3 @@ def changeZennyAmount(value):
     for i in valueBytes:
         saveFileData[offset] = i
         offset = offset + 1
-
-#openFile('user1')
-#printItemList()
