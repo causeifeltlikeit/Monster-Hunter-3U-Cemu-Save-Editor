@@ -9,10 +9,21 @@ filePath = ''
 itemList = []
 
 def getFile():
+    global itemList
     filePath = tk.filedialog.askopenfilename(title="Select Save File")
     print(filePath)
     openFile(filePath)
+    itemList = getItemList()
+    updateListbox()
     return filePath
+
+def updateListbox():
+    itemListBox.delete(0,'end')
+    index = 1
+    print(itemList)
+    for i in itemList:
+        itemListBox.insert(index,i)
+        index=index+1
 
 #menus
 root = tk.Tk()
@@ -27,12 +38,13 @@ fileMenu.add_command(label ='testing', command = printItemList)
 #tabs
 notebook = ttk.Notebook(root)
 
-tab1 = ttk.Frame(notebook)
-tab2 = ttk.Frame(notebook)
+listBoxTab = ttk.Frame(notebook)
+notebook.add(listBoxTab, text='Item Box')
 
+global itemListBox
+itemListBox = tk.Listbox(listBoxTab)
+itemListBox.pack()
 
-notebook.add(tab1, text='Item Box')
-notebook.add(tab2, text='Character Details')
 notebook.pack(expand=1, fill="both")
 
 

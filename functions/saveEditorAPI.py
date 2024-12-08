@@ -2,12 +2,15 @@ from data.offsets import *
 from data.itemCodes import *
 
 saveFileData = None
+currentItemPage = []
 
 def openFile(fileName):
     global saveFileData
+    global currentItemPage
     with open(fileName,"rb") as f:
         data = f.read()
     saveFileData = bytearray(data)
+    currentItemPage = printItemList(1)
 
 def saveFile(fileName):
     f = open(fileName, "wb")
@@ -26,11 +29,16 @@ def changeName(changedName):
         saveFileData[offset] = 0
         offset = offset + 1
     
-def printItemList():
+def printItemList(pageNumber):
+    tempList = []
     offset = itemBoxOffset
-    for i in range(1,1000):
-        print(str(itemList[(saveFileData[offset],saveFileData[offset+1])].name) + ' ' + str(saveFileData[offset+3]))
+    for i in range(pageNumber,pageNumber * 100):
+        tempList.append(str(itemList[(saveFileData[offset],saveFileData[offset+1])].name) + ' ' + str(saveFileData[offset+3]))
         offset = offset + 4
+    return tempList
+
+def getItemList():
+    return currentItemPage
         
 def changeItem(itemLocation, itemID, itemQuantity):
     global saveFileData
