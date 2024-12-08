@@ -33,8 +33,7 @@ def printItemList(pageNumber):
     tempList = []
     offset = itemBoxOffset
     for i in range(pageNumber,(pageNumber * 100)+1):
-        tempList.append((str(itemList[(saveFileData[offset],saveFileData[offset+1])].name), saveFileData[offset+3]))
-        #tempList.append(str(itemList[(saveFileData[offset],saveFileData[offset+1])].name) + ' ' + str(saveFileData[offset+3]))
+        tempList.append((str(itemList[(saveFileData[offset],saveFileData[offset+1])].name), saveFileData[offset+3],(saveFileData[offset],saveFileData[offset+1])))
         offset = offset + 4
     return tempList
 

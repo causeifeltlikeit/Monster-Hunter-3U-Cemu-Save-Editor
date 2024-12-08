@@ -4,9 +4,14 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import Menu
 from tkinter import ttk
+from tkinter import StringVar
+from tkinter import Toplevel
+from tkinter import Entry
+from tkinter import Button
 
 
 global itemBoxTree
+global root
 
 filePath = ''
 itemList = []
@@ -44,11 +49,38 @@ def updateListboxTree():
         itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
         index = index + 1
         
+def submit(top,curItem, quantityEntry):
+    global itemList
+    try:
+        itemQuant = int(quantityEntry.get())
+        index = itemBoxTree.item(curItem)['values'][0]-1
+        #change tree
+        itemBoxTree.item(curItem, values=(itemBoxTree.item(curItem)['values'][0], itemBoxTree.item(curItem)['values'][1], itemQuant))
+        #change itemlist, not sure if strictly necessary but whatever
+        itemList[index] = (itemList[index][0],itemQuant,itemList[index][2])
+        #change overall save data
+        changeItem(index,itemList[index][2],itemQuant)
+        top.destroy()
+    except:
+        top.destroy()
+    
+   
 def modifyItem(a):
+    
+    top = Toplevel(root)
+    top.geometry("+%d+%d" %(root.winfo_x()+100,root.winfo_y()+100))
+    
+    
     curItem = itemBoxTree.focus()
-    print(itemBoxTree.item(curItem))
-    itemBoxTree.item(curItem, values=("foo", "bar", 'test'))
 
+    #itemEntry = Entry(top, width= 25)
+    quantityEntry = Entry(top, width= 25)
+    #itemEntry.pack()
+    quantityEntry.pack()
+   
+    #Create a Button Widget in the Toplevel Window
+    button= Button(top, text="Ok", command=lambda:submit(top,curItem, quantityEntry))
+    button.pack(pady=5, side= tk.TOP)
 
 root = tk.Tk()
 root.title('MH3U Save File Editor')
