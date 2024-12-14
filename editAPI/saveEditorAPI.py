@@ -2,15 +2,12 @@ from data.offsets import *
 from data.itemCodes import *
 
 saveFileData = None
-currentItemPage = []
 
 def openFile(fileName):
     global saveFileData
-    global currentItemPage
     with open(fileName,"rb") as f:
         data = f.read()
     saveFileData = bytearray(data)
-    currentItemPage = printItemList(1)
 
 def saveFile(fileName):
     f = open(fileName, "wb")
@@ -29,7 +26,7 @@ def changeName(changedName):
         saveFileData[offset] = 0
         offset = offset + 1
     
-def printItemList(pageNumber):
+def getItemList(pageNumber):
     tempList = []
     offset = itemBoxOffset
     for i in range(pageNumber,(pageNumber * 100)+1):
@@ -43,9 +40,6 @@ def changeItem(itemLocation, itemID, itemQuantity):
     saveFileData[offset] = itemList[itemID].byte1
     saveFileData[offset + 1] = itemList[itemID].byte2
     saveFileData[offset + 3] = itemQuantity
-
-def getItemList():
-    return currentItemPage
     
 def printZennyAmount():
     print(int.from_bytes(saveFileData[zennyOffset].to_bytes() + saveFileData[zennyOffset + 1].to_bytes() + saveFileData[zennyOffset + 2].to_bytes()))

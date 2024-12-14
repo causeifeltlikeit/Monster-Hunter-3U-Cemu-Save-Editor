@@ -6,7 +6,7 @@ class item:
     
     def printItem(self):
         print(self.name +' '+ str(self.byte1) + str(self.byte2) + ' ' + str(hex(self.byte1)) + str(hex(self.byte2)))
-        print("tst")
+
         
     def getName(self):
         return self.name
@@ -16,6 +16,19 @@ class item:
     
     def getByte2(self):
         return self.byte2
+    
+def getItemListTotal():
+    return itemList
+
+def getItemNameList():
+    returnList = []
+    for i in itemList.values():
+        returnList.append(i.getName())
+    return returnList
+
+def getItemCodesFromIndex(index):
+    temp = list(itemList.values())
+    return((temp[index].getByte1(),temp[index].getByte2()))
     
 itemList = {
     (0,0):item('None',0,0),
