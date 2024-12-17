@@ -21,9 +21,8 @@ def getFile():
     global itemList
     filePath = tk.filedialog.askopenfilename(title="Select Save File")
     openFile(filePath)
-    itemList = getItemList(1)
+    itemList = getItemList(boxIndex)
     updateListboxTree()
-    return filePath
 
 def saveTheFile():
     saveFile('user2')
@@ -40,6 +39,7 @@ def itemBoxTreeCreator(tab):
     return itemBoxTree
 
 def updateListboxTree():
+    global itemBoxTree
     for i in itemBoxTree.get_children():
         itemBoxTree.delete(i)
     index = 1 + ((boxIndex-1) *100)
@@ -47,24 +47,6 @@ def updateListboxTree():
         itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
         index = index + 1
         
-def itemBoxSubmit(top,quantityEntry,itemEntry,curItem):
-    global itemList
-    index = itemBoxTree.item(curItem)['values'][0]-1
-    
-    #change tree
-    itemBoxTree.item(curItem, values=(itemBoxTree.item(curItem)['values'][0], getItemNameList()[itemEntry.current()], int(quantityEntry.current())))
-    
-    #change itemlist, not sure if strictly necessary but whatever
-    itemList[index] = (getItemNameList()[itemEntry.current()],int(quantityEntry.current()),getItemCodesFromIndex(itemEntry.current()))
-    
-    #change overall save data
-    changeItem(index,getItemCodesFromIndex(itemEntry.current()),int(quantityEntry.current()))
-    
-    #kill popup
-    top.destroy()
-
-    
-   
 def modifyItem(a):
     #create popup window
     top = Toplevel(root)
@@ -90,6 +72,29 @@ def modifyItem(a):
     #Create a Button Widget in the Toplevel Window
     button= Button(top, text="Ok", command=lambda:itemBoxSubmit(top,quantityEntry,itemEntry,curItem))
     button.grid(row = 2, column = 1, pady = 2)
+        
+def itemBoxSubmit(top,quantityEntry,itemEntry,curItem):
+    global itemList
+    index = itemBoxTree.item(curItem)['values'][0]-1
+    
+    #change tree
+    itemBoxTree.item(curItem, values=(itemBoxTree.item(curItem)['values'][0], getItemNameList()[itemEntry.current()], int(quantityEntry.current())))
+    
+    #change itemlist, not sure if strictly necessary but whatever
+    itemList[index % 100] = (getItemNameList()[itemEntry.current()],int(quantityEntry.current()),getItemCodesFromIndex(itemEntry.current()))
+    
+    #change overall save data
+    changeItem(index,getItemCodesFromIndex(itemEntry.current()),int(quantityEntry.current()))
+    
+    #kill popup
+    top.destroy()
+
+def changePage(a):
+    global boxIndex
+    global itemList
+    boxIndex = boxNumber.current() + 1
+    itemList = getItemList(boxIndex - 1)
+    updateListboxTree()
 
 root = tk.Tk()
 root.title('MH3U Save File Editor')
@@ -108,9 +113,15 @@ listBoxTab = ttk.Frame(notebook)
 notebook.add(listBoxTab, text='Item Box')
 notebook.pack(expand=1, fill="both")
 
+#Create item box and bind to detect changes
 itemBoxTree = itemBoxTreeCreator(listBoxTab)
 itemBoxTree.bind('<Double-Button-1>', modifyItem)
 
+#create box number chooser and bind to detect changes
+boxNumber = ttk.Combobox(listBoxTab, values=list(range(1,11)))
+boxNumber.current(0)
+boxNumber.pack()
+boxNumber.bind('<<ComboboxSelected>>', changePage)
 
 root.config(menu = menubar)
 root.geometry("500x300")

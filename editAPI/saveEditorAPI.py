@@ -28,8 +28,8 @@ def changeName(changedName):
     
 def getItemList(pageNumber):
     tempList = []
-    offset = itemBoxOffset
-    for i in range(pageNumber,(pageNumber * 100)+1):
+    offset = itemBoxOffset + ( 4 * pageNumber * 100)
+    for i in range(pageNumber * 100,(pageNumber * 100)+100):
         tempList.append((str(itemList[(saveFileData[offset],saveFileData[offset+1])].name), saveFileData[offset+3],(saveFileData[offset],saveFileData[offset+1])))
         offset = offset + 4
     return tempList
