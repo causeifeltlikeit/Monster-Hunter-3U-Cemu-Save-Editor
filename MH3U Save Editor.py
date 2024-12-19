@@ -12,6 +12,10 @@ from tkinter import Label
 
 global itemBoxTree
 global root
+global playerNameEntry
+global zennyEntry
+    
+
 
 filePath = ''
 itemList = []
@@ -22,6 +26,7 @@ def getFile():
     filePath = tk.filedialog.askopenfilename(title="Select Save File")
     openFile(filePath)
     itemList = getItemList(boxIndex)
+    playerInfoTabUpdater()
     updateListboxTree()
 
 def saveTheFile():
@@ -36,6 +41,7 @@ def itemBoxTreeCreator(tab):
     itemBoxTree.heading("c2", text="Item")
     itemBoxTree.column("c3", anchor=tk.W,width=80)
     itemBoxTree.heading("c3", text="Quantity")
+    
     return itemBoxTree
 
 def updateListboxTree():
@@ -95,7 +101,33 @@ def changePage(a):
     boxIndex = boxNumber.current() + 1
     itemList = getItemList(boxIndex - 1)
     updateListboxTree()
+    
+def playerInfoTabCreator(playerInfoTab):
+    global playerNameEntry
+    global zennyEntry
+    label1 = Label( playerInfoTab, text='Player Name')
+    label2 = Label( playerInfoTab, text='Zenny Amount')
+    playerNameEntry = tk.Entry(playerInfoTab)
+    zennyEntry = tk.Entry(playerInfoTab)
+    label1.grid(row = 0, column = 0, pady = 2)
+    label2.grid(row = 1, column = 0, pady = 2)
+    playerNameEntry.grid(row = 0, column = 1, pady = 2)
+    zennyEntry.grid(row = 1, column = 1, pady = 2)
+    submitButton = Button(playerInfoTab, text="Change", command=changePlayerInfo)
+    submitButton.grid(row=2, column=0)
 
+def playerInfoTabUpdater():
+    global playerNameEntry
+    global zennyEntry
+    playerNameEntry.delete(0,tk.END)
+    playerNameEntry.insert(0,getPlayerName())
+    zennyEntry.delete(0,tk.END)
+    zennyEntry.insert(0,str(getZennyAmount()))
+
+def changePlayerInfo():
+    changePlayerName(str(playerNameEntry.get()))
+    changeZennyAmount(int(zennyEntry.get()))
+    
 root = tk.Tk()
 root.title('MH3U Save File Editor')
 
@@ -109,20 +141,27 @@ fileMenu.add_command(label ='Save File', command = saveTheFile)
 
 #tabs
 notebook = ttk.Notebook(root)
+
+#Player into tab
+playerInfoTab = ttk.Frame(notebook)
+notebook.add(playerInfoTab, text='Player Info')
+playerInfoTabCreator(playerInfoTab)
+
+#Item List Box Tab
 listBoxTab = ttk.Frame(notebook)
 notebook.add(listBoxTab, text='Item Box')
-notebook.pack(expand=1, fill="both")
-
 #Create item box and bind to detect changes
 itemBoxTree = itemBoxTreeCreator(listBoxTab)
 itemBoxTree.bind('<Double-Button-1>', modifyItem)
-
 #create box number chooser and bind to detect changes
 boxNumber = ttk.Combobox(listBoxTab, values=list(range(1,11)))
 boxNumber.current(0)
 boxNumber.pack()
 boxNumber.bind('<<ComboboxSelected>>', changePage)
 
+
+
+notebook.pack(expand=1, fill="both")
 root.config(menu = menubar)
 root.geometry("500x300")
 root.mainloop()

@@ -14,7 +14,7 @@ def saveFile(fileName):
     f.write(saveFileData)
     f.close()
 
-def changeName(changedName):
+def changePlayerName(changedName):
     global saveFileData
     characters = list(changedName)
     offset = nameOffset
@@ -22,9 +22,14 @@ def changeName(changedName):
         saveFileData[offset] = int.from_bytes(i.encode('utf-8'))
         offset = offset + 1
     
-    while (offset < 53):
+    while (offset < nameOffset + 10):
         saveFileData[offset] = 0
         offset = offset + 1
+
+def getPlayerName():
+    name = saveFileData[nameOffset:nameOffset + 10]
+    return name.decode()
+    
     
 def getItemList(pageNumber):
     tempList = []
@@ -41,8 +46,8 @@ def changeItem(itemLocation, itemID, itemQuantity):
     saveFileData[offset + 1] = itemList[itemID].byte2
     saveFileData[offset + 3] = itemQuantity
     
-def printZennyAmount():
-    print(int.from_bytes(saveFileData[zennyOffset].to_bytes() + saveFileData[zennyOffset + 1].to_bytes() + saveFileData[zennyOffset + 2].to_bytes()))
+def getZennyAmount():
+    return int.from_bytes(saveFileData[zennyOffset].to_bytes() + saveFileData[zennyOffset + 1].to_bytes() + saveFileData[zennyOffset + 2].to_bytes())
 
 def changeZennyAmount(value):
     global saveFileData
