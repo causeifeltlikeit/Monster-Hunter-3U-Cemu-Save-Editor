@@ -1,5 +1,6 @@
 from data.offsets import *
 from data.itemCodes import *
+from data.equipmentCodes import *
 
 saveFileData = None
 
@@ -30,13 +31,13 @@ def getPlayerName():
     name = saveFileData[nameOffset:nameOffset + 10]
     return name.decode()
 
-"""
+
 def getEquipmentList():
     offset = equipmentOffset
     for i in range(20):
-        print(str(equipmentList[(saveFileData[offset],saveFileData[offset+3])].name))
+        print(str(equipmentList[(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])].name))
         offset = offset + 16
-"""
+
     
 def getItemList(pageNumber):
     tempList = []
@@ -63,3 +64,6 @@ def changeZennyAmount(value):
     for i in valueBytes:
         saveFileData[offset] = i
         offset = offset + 1
+
+openFile('user1')
+getEquipmentList()
