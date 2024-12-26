@@ -34,9 +34,14 @@ def getPlayerName():
 
 def getEquipmentList():
     offset = equipmentOffset
-    for i in range(20):
-        print(str(equipmentList[(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])].name))
-        offset = offset + 16
+    for i in range(100):
+        try:
+            print(str(equipmentList[(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])].name))
+            offset = offset + 16
+        except:
+            print((saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3]))
+            offset = offset + 16
+
 
     
 def getItemList(pageNumber):
