@@ -35,9 +35,6 @@ def getEquipmentList():
     for i in range(20):
         print(str(equipmentList[(saveFileData[offset],saveFileData[offset+3])].name))
         offset = offset + 16
-
-
-
     
 def getItemList(pageNumber):
     tempList = []
