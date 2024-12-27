@@ -11,6 +11,8 @@ from tkinter import Button
 from tkinter import Label
 
 global itemBoxTree
+global equipmentBoxTree
+
 global root
 global playerNameEntry
 global zennyEntry
@@ -19,15 +21,20 @@ global zennyEntry
 
 filePath = ''
 itemList = []
+equipmentList = []
 boxIndex = 1
+eboxIndex = 1
 
 def getFile():
     global itemList
+    global equipmentList
     filePath = tk.filedialog.askopenfilename(title="Select Save File")
     openFile(filePath)
     itemList = getItemList(boxIndex)
+    equipmentList = getEquipmentList(eboxIndex)
     playerInfoTabUpdater()
     updateListboxTree()
+    updateEquipmentboxTree()
 
 def saveTheFile():
     saveFile('user2')
@@ -41,8 +48,16 @@ def itemBoxTreeCreator(tab):
     itemBoxTree.heading("c2", text="Item")
     itemBoxTree.column("c3", anchor=tk.W,width=80)
     itemBoxTree.heading("c3", text="Quantity")
-    
     return itemBoxTree
+
+def equipmentBoxTreeCreator(tab):
+    equipmentBoxTree = ttk.Treeview(tab,column = ('c1','c2'),show='headings', height=5)
+    equipmentBoxTree.pack(expand=1, fill="both")
+    equipmentBoxTree.column("c1", anchor=tk.CENTER,width=80)
+    equipmentBoxTree.heading("c1", text="Equipment Number")
+    equipmentBoxTree.column("c2", anchor=tk.W,width=80)
+    equipmentBoxTree.heading("c2", text="Equipment")
+    return equipmentBoxTree
 
 def updateListboxTree():
     global itemBoxTree
@@ -51,6 +66,15 @@ def updateListboxTree():
     index = 1 + ((boxIndex-1) *100)
     for i in itemList:
         itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
+        index = index + 1
+
+def updateEquipmentboxTree():
+    global equipmentBoxTree
+    for i in equipmentBoxTree.get_children():
+        equipmentBoxTree.delete(i)
+    index = 1 + ((boxIndex-1) *100)
+    for i in equipmentList:
+        equipmentBoxTree.insert('', 'end', values=(index, i[0], i[1]))
         index = index + 1
         
 def modifyItem(a):
@@ -101,6 +125,14 @@ def changePage(a):
     boxIndex = boxNumber.current() + 1
     itemList = getItemList(boxIndex - 1)
     updateListboxTree()
+
+def echangePage(a):
+    global eboxIndex
+    global equipmentList
+    eboxIndex = eboxNumber.current() + 1
+    equipmentList = getEquipmentList(eboxIndex)
+    print(eboxIndex)
+    updateEquipmentboxTree()
     
 def playerInfoTabCreator(playerInfoTab):
     global playerNameEntry
@@ -127,6 +159,8 @@ def playerInfoTabUpdater():
 def changePlayerInfo():
     changePlayerName(str(playerNameEntry.get()))
     changeZennyAmount(int(zennyEntry.get()))
+    
+    
     
 root = tk.Tk()
 root.title('MH3U Save File Editor')
@@ -159,7 +193,23 @@ boxNumber.current(0)
 boxNumber.pack()
 boxNumber.bind('<<ComboboxSelected>>', changePage)
 
-
+#Equipment List Box Tab
+equipmentBoxtab = ttk.Frame(notebook)
+notebook.add(equipmentBoxtab, text='Equipment Box')
+#Create item box and bind to detect changes
+equipmentBoxTree = equipmentBoxTreeCreator(equipmentBoxtab)
+eboxNumber = ttk.Combobox(equipmentBoxtab, values=list(range(1,11)))
+eboxNumber.current(0)
+eboxNumber.pack()
+eboxNumber.bind('<<ComboboxSelected>>', echangePage)
+"""
+itemBoxTree.bind('<Double-Button-1>', modifyItem)
+#create box number chooser and bind to detect changes
+boxNumber = ttk.Combobox(listBoxTab, values=list(range(1,11)))
+boxNumber.current(0)
+boxNumber.pack()
+boxNumber.bind('<<ComboboxSelected>>', changePage)
+"""
 
 notebook.pack(expand=1, fill="both")
 root.config(menu = menubar)

@@ -32,16 +32,14 @@ def getPlayerName():
     return name.decode()
 
 
-def getEquipmentList():
-    offset = equipmentOffset
-    for i in range(100):
-        try:
-            print(str(equipmentList[(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])].name))
-            offset = offset + 16
-        except:
-            print((saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3]))
-            offset = offset + 16
-
+def getEquipmentList(pageNumber):
+    pageNumber = pageNumber - 1
+    tempList = []
+    offset = equipmentOffset + (16 * pageNumber * 100) 
+    for i in range(pageNumber * 100,(pageNumber * 100)+100):
+        tempList.append((str(equipmentList[(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])].name),(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])))
+        offset = offset + 16
+    return tempList
 
     
 def getItemList(pageNumber):
@@ -69,6 +67,3 @@ def changeZennyAmount(value):
     for i in valueBytes:
         saveFileData[offset] = i
         offset = offset + 1
-
-openFile('user1')
-getEquipmentList()

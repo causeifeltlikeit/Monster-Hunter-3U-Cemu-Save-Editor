@@ -21,6 +21,7 @@ class equipment:
         return self.byte3
     
 equipmentList = {
+    (0,0,0):equipment('None',0,0,0),
     #chest
     (1,0,1):equipment('Leather Vest',1,0,1),
     (1,0,2):equipment('Chainmail Vest',1,0,2),
