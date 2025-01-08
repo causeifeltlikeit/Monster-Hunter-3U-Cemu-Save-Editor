@@ -19,6 +19,34 @@ class equipment:
     
     def getByte3(self):
         return self.byte3
+
+def getEquipmentType(index):
+    return equipmentCodes[index]
+
+def getEquipmentTypeList():
+    return ['Chest','Arms','Waist','Legs','Head','Charm','Greatsword','SNS','Hammer','Lance','HBG','LBG','Longsword','Switchaxe','Gunlance','Bow','Dualblades','Hunting Horn']
+
+equipmentCodes = {
+    0: 'None',
+    1: 'Chest',
+    2: 'Arms',
+    3: 'Waist',
+    4: 'Legs',
+    5: 'Head',
+    6: 'Charm',
+    7: 'Greatsword',
+    8: 'SNS',
+    9: 'Hammer',
+    10: 'Lance',
+    11: 'HBG',
+    13: 'LBG',
+    14: 'Longsword',
+    15: 'Switchaxe',
+    16: 'Gunlance',
+    17: 'Bow',
+    15: 'Dualblades',
+    16: 'Hunting Horn',
+}
     
 equipmentList = {
     (0,0,0):equipment('None',0,0,0),
