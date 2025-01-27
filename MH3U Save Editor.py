@@ -30,7 +30,7 @@ def getFile():
     global equipmentList
     filePath = tk.filedialog.askopenfilename(title="Select Save File")
     openFile(filePath)
-    itemList = getItemList(boxIndex)
+    itemList = getItemList(boxIndex - 1)
     equipmentList = getEquipmentList(eboxIndex)
     playerInfoTabUpdater()
     updateListboxTree()
