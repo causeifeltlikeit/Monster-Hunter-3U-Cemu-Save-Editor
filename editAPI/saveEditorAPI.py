@@ -4,13 +4,13 @@ from data.equipmentCodes import *
 
 saveFileData = None
 
-def openFile(fileName):
+def openSaveFile(fileName):
     global saveFileData
     with open(fileName,"rb") as f:
         data = f.read()
     saveFileData = bytearray(data)
 
-def saveFile(fileName):
+def saveSaveFile(fileName):
     f = open(fileName, "wb")
     f.write(saveFileData)
     f.close()
@@ -46,15 +46,16 @@ def getItemList(pageNumber):
     tempList = []
     offset = itemBoxOffset + ( 4 * pageNumber * 100)
     for i in range(pageNumber * 100,(pageNumber * 100)+100):
-        tempList.append((str(itemList[(saveFileData[offset],saveFileData[offset+1])].name), saveFileData[offset+3],(saveFileData[offset],saveFileData[offset+1])))
+        tempList.append((getItemFromHex(saveFileData[offset],saveFileData[offset+1]),saveFileData[offset+3]))
         offset = offset + 4
     return tempList
 
-def changeItem(itemLocation, itemID, itemQuantity):
+def changeItem(itemLocation, itemName, itemQuantity):
     global saveFileData
     offset = itemBoxOffset + (4*itemLocation)
-    saveFileData[offset] = itemList[itemID].byte1
-    saveFileData[offset + 1] = itemList[itemID].byte2
+    hexValue = getItemFromString(itemName)
+    saveFileData[offset] = hexValue[0]
+    saveFileData[offset + 1] = hexValue[1]
     saveFileData[offset + 3] = itemQuantity
     
 def getZennyAmount():

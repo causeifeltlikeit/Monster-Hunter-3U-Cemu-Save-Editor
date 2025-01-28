@@ -25,19 +25,19 @@ equipmentList = []
 boxIndex = 1
 eboxIndex = 1
 
-def getFile():
+def openFile():
     global itemList
     global equipmentList
     filePath = tk.filedialog.askopenfilename(title="Select Save File")
-    openFile(filePath)
+    openSaveFile(filePath)
     itemList = getItemList(boxIndex - 1)
     equipmentList = getEquipmentList(eboxIndex)
     playerInfoTabUpdater()
     updateListboxTree()
     updateEquipmentboxTree()
 
-def saveTheFile():
-    saveFile('user2')
+def saveFile():
+    saveSaveFile('user2')
     
 def itemBoxTreeCreator(tab):
     itemBoxTree = ttk.Treeview(tab,column = ('c1','c2','c3'),show='headings', height=5)
@@ -90,8 +90,8 @@ def modifyItem(a):
     label1.grid(row = 0, column = 0, pady = 2)
     label2.grid(row = 1, column = 0, pady = 2)
     #Which Item Entry
-    itemEntry = ttk.Combobox(top, values=getItemNameList())
-    itemEntry.current(getItemNameList().index(itemBoxTree.item(curItem)['values'][1]))
+    itemEntry = ttk.Combobox(top, values=getItemListNames())
+    itemEntry.current(getItemListNames().index(itemBoxTree.item(curItem)['values'][1]))
     itemEntry.grid(row = 0, column = 1, pady = 2)
     #How Many Entry
     quantityEntry = ttk.Combobox(top, values=list(range(100)))
@@ -105,11 +105,11 @@ def itemBoxSubmit(top,quantityEntry,itemEntry,curItem):
     global itemList
     index = itemBoxTree.item(curItem)['values'][0]-1
     #change tree
-    itemBoxTree.item(curItem, values=(itemBoxTree.item(curItem)['values'][0], getItemNameList()[itemEntry.current()], int(quantityEntry.current())))
+    itemBoxTree.item(curItem, values=(itemBoxTree.item(curItem)['values'][0], getItemListNames()[itemEntry.current()], int(quantityEntry.current())))
     #change itemlist, not sure if strictly necessary but whatever
-    itemList[index % 100] = (getItemNameList()[itemEntry.current()],int(quantityEntry.current()),getItemCodesFromIndex(itemEntry.current()))
+    itemList[index % 100] = (getItemListNames()[itemEntry.current()],int(quantityEntry.current()))
     #change overall save data
-    changeItem(index,getItemCodesFromIndex(itemEntry.current()),int(quantityEntry.current()))
+    changeItem(index,getItemListNames()[itemEntry.current()],int(quantityEntry.current()))
     #kill popup
     top.destroy()
     
@@ -184,8 +184,8 @@ root.title('MH3U Save File Editor')
 menubar = Menu(root)
 fileMenu = Menu(menubar,tearoff =0)
 menubar.add_cascade(label ='File', menu = fileMenu) 
-fileMenu.add_command(label ='Open File', command = getFile) 
-fileMenu.add_command(label ='Save File', command = saveTheFile) 
+fileMenu.add_command(label ='Open File', command = openFile) 
+fileMenu.add_command(label ='Save File', command = saveFile) 
 
 
 #tabs
