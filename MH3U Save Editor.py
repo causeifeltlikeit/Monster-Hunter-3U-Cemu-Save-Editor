@@ -1,226 +1,152 @@
-from editAPI.saveEditorAPI import*
-
+from fileEditAPI.saveEditorAPI import*
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import Menu
+import tkinter.filedialog
 from tkinter import ttk
-from tkinter import StringVar
-from tkinter import Toplevel
-from tkinter import Entry
-from tkinter import Button
-from tkinter import Label
+itemListUI = []
 
-global itemBoxTree
-global equipmentBoxTree
-
-global root
-global playerNameEntry
-global zennyEntry
+class saveEditor(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title('MH3U Save File Editor')
+        self.geometry("500x300")
+        self.minsize(500,300)
+        self.fileMenu = fileMenu(self)
+        self.notebook = notebook(self)
+        self.mainloop()
     
-
-
-filePath = ''
-itemList = []
-equipmentList = []
-boxIndex = 1
-eboxIndex = 1
-
-def openFile():
-    global itemList
-    global equipmentList
-    filePath = tk.filedialog.askopenfilename(title="Select Save File")
-    openSaveFile(filePath)
-    itemList = getItemList(boxIndex - 1)
-    equipmentList = getEquipmentList(eboxIndex)
-    playerInfoTabUpdater()
-    updateListboxTree()
-    updateEquipmentboxTree()
-
-def saveFile():
-    saveSaveFile('user2')
-    
-def itemBoxTreeCreator(tab):
-    itemBoxTree = ttk.Treeview(tab,column = ('c1','c2','c3'),show='headings', height=5)
-    itemBoxTree.pack(expand=1, fill="both")
-    itemBoxTree.column("c1", anchor=tk.CENTER,width=80)
-    itemBoxTree.heading("c1", text="Item Number")
-    itemBoxTree.column("c2", anchor=tk.W,width=80)
-    itemBoxTree.heading("c2", text="Item")
-    itemBoxTree.column("c3", anchor=tk.W,width=80)
-    itemBoxTree.heading("c3", text="Quantity")
-    return itemBoxTree
-
-def equipmentBoxTreeCreator(tab):
-    equipmentBoxTree = ttk.Treeview(tab,column = ('c1','c2','c3'),show='headings', height=5)
-    equipmentBoxTree.pack(expand=1, fill="both")
-    equipmentBoxTree.column("c1", anchor=tk.CENTER,width=80)
-    equipmentBoxTree.heading("c1", text="Equipment Number")
-    equipmentBoxTree.column("c2", anchor=tk.W,width=80)
-    equipmentBoxTree.heading("c2", text="Type")
-    equipmentBoxTree.column("c3", anchor=tk.W,width=80)
-    equipmentBoxTree.heading("c3", text="Equipment")
-    return equipmentBoxTree
-
-def updateListboxTree():
-    global itemBoxTree
-    for i in itemBoxTree.get_children():
-        itemBoxTree.delete(i)
-    index = 1 + ((boxIndex-1) *100)
-    for i in itemList:
-        itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
-        index = index + 1
-
-def updateEquipmentboxTree():
-    global equipmentBoxTree
-    for i in equipmentBoxTree.get_children():
-        equipmentBoxTree.delete(i)
-    index = 1 + ((boxIndex-1) *100)
-    for i in equipmentList:
-        equipmentBoxTree.insert('', 'end', values=(index, getEquipmentType(i[1][0]), i[0]))
-        index = index + 1
+class fileMenu(tk.Menu):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        fileMenu = tk.Menu(self,tearoff =0)
+        self.add_cascade(label ='File', menu = fileMenu) 
+        fileMenu.add_command(label ='Open File',command = self.openFile) 
+        fileMenu.add_command(label ='Save File',command = self.saveFile) 
+        parent.config(menu=self)
         
-def modifyItem(a):
-    #create popup window
-    top = Toplevel(root)
-    #center it on current window placement
-    top.geometry("+%d+%d" %(root.winfo_x()+100,root.winfo_y()+100))
-    curItem = itemBoxTree.focus()
-    label1 = Label( top, text='Choose Item')
-    label2 = Label( top, text='Choose Quantity')
-    label1.grid(row = 0, column = 0, pady = 2)
-    label2.grid(row = 1, column = 0, pady = 2)
-    #Which Item Entry
-    itemEntry = ttk.Combobox(top, values=getItemListNames())
-    itemEntry.current(getItemListNames().index(itemBoxTree.item(curItem)['values'][1]))
-    itemEntry.grid(row = 0, column = 1, pady = 2)
-    #How Many Entry
-    quantityEntry = ttk.Combobox(top, values=list(range(100)))
-    quantityEntry.current(itemBoxTree.item(curItem)['values'][2])
-    quantityEntry.grid(row = 1, column = 1, pady = 2)
-    #Create a Button Widget in the Toplevel Window
-    button= Button(top, text="Ok", command=lambda:itemBoxSubmit(top,quantityEntry,itemEntry,curItem))
-    button.grid(row = 2, column = 1, pady = 2)
         
-def itemBoxSubmit(top,quantityEntry,itemEntry,curItem):
-    global itemList
-    index = itemBoxTree.item(curItem)['values'][0]-1
-    #change tree
-    itemBoxTree.item(curItem, values=(itemBoxTree.item(curItem)['values'][0], getItemListNames()[itemEntry.current()], int(quantityEntry.current())))
-    #change itemlist, not sure if strictly necessary but whatever
-    itemList[index % 100] = (getItemListNames()[itemEntry.current()],int(quantityEntry.current()))
-    #change overall save data
-    changeItem(index,getItemListNames()[itemEntry.current()],int(quantityEntry.current()))
-    #kill popup
-    top.destroy()
+    def openFile(self):
+        global itemListUI
+        filePath = tk.filedialog.askopenfilename(title="Select Save File")
+        openSaveFile(filePath)
+        itemListUI = getItemList(0)
+
+        self.parent.notebook.updatePlayerTab()
+        self.parent.notebook.updateListboxTree()
+        
+    def saveFile(self):
+        saveSaveFile('user2')
+        
+        
+class notebook(ttk.Notebook):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.playerInfotab = playerInfoTab(self)
+        self.itemBoxListTab = itemBoxListTab(self)
+        self.pack(expand=1, fill="both")
+        
+    def updatePlayerTab(self):
+        self.playerInfotab.updatePlayerTab()
     
-def modifyEquipment(a):
-    #create popup window
-    top = Toplevel(root)
-    #center it on current window placement
-    top.geometry("+%d+%d" %(root.winfo_x()+100,root.winfo_y()+100))
-    curItem = equipmentBoxTree.focus()
-    label1 = Label( top, text='Choose Equipment Type')
-    label2 = Label( top, text='Choose Equipment')
-    label3 = Label( top, text='Choose Skill One')
-    label4 = Label( top, text='Choose Skill Two')
-    label5 = Label( top, text='Slots?')
-    label1.grid(row = 0, column = 0, pady = 2)
-    label2.grid(row = 1, column = 0, pady = 2)
-    label3.grid(row = 2, column = 0, pady = 2)
-    label4.grid(row = 3, column = 0, pady = 2)
-    label5.grid(row = 5, column = 0, pady = 2)
+    def updateListboxTree(self):
+        self.itemBoxListTab.updateListboxTree()
+        
+class playerInfoTab(ttk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.label1 = Label( self, text='Player Name')
+        self.label2 = Label( self, text='Zenny Amount')
+        self.playerNameEntry = tk.Entry(self)
+        self.zennyEntry = tk.Entry(self)
+        self.label1.grid(row = 0, column = 0, pady = 2)
+        self.label2.grid(row = 1, column = 0, pady = 2)
+        self.playerNameEntry.grid(row = 0, column = 1, pady = 2)
+        self.zennyEntry.grid(row = 1, column = 1, pady = 2)
+        self.submitButton = Button(self, text="Change", command = self.changePlayerInfo)
+        self.submitButton.grid(row=2, column=0)
+        parent.add(self, text = 'Player Info')
     
-    typeChoose = ttk.Combobox(top, values=getEquipmentTypeList())
-    #typeChoose.current(getItemNameList().index(itemBoxTree.item(curItem)['values'][1]))
-    typeChoose.grid(row = 0, column = 1, pady = 2)
-
-def changePage(a):
-    global boxIndex
-    global itemList
-    boxIndex = boxNumber.current() + 1
-    itemList = getItemList(boxIndex - 1)
-    updateListboxTree()
-
-def echangePage(a):
-    global eboxIndex
-    global equipmentList
-    eboxIndex = eboxNumber.current() + 1
-    equipmentList = getEquipmentList(eboxIndex)
-    print(eboxIndex)
-    updateEquipmentboxTree()
+    def updatePlayerTab(self):
+        self.playerNameEntry.delete(0,tk.END)
+        self.playerNameEntry.insert(0,getPlayerName())
+        self.zennyEntry.delete(0,tk.END)
+        self.zennyEntry.insert(0,str(getZennyAmount()))
     
-def playerInfoTabCreator(playerInfoTab):
-    global playerNameEntry
-    global zennyEntry
-    label1 = Label( playerInfoTab, text='Player Name')
-    label2 = Label( playerInfoTab, text='Zenny Amount')
-    playerNameEntry = tk.Entry(playerInfoTab)
-    zennyEntry = tk.Entry(playerInfoTab)
-    label1.grid(row = 0, column = 0, pady = 2)
-    label2.grid(row = 1, column = 0, pady = 2)
-    playerNameEntry.grid(row = 0, column = 1, pady = 2)
-    zennyEntry.grid(row = 1, column = 1, pady = 2)
-    submitButton = Button(playerInfoTab, text="Change", command=changePlayerInfo)
-    submitButton.grid(row=2, column=0)
+    def changePlayerInfo(self):
+        changePlayerName(str(self.playerNameEntry.get()))
+        changeZennyAmount(int(self.zennyEntry.get()))
 
-def playerInfoTabUpdater():
-    global playerNameEntry
-    global zennyEntry
-    playerNameEntry.delete(0,tk.END)
-    playerNameEntry.insert(0,getPlayerName())
-    zennyEntry.delete(0,tk.END)
-    zennyEntry.insert(0,str(getZennyAmount()))
-
-def changePlayerInfo():
-    changePlayerName(str(playerNameEntry.get()))
-    changeZennyAmount(int(zennyEntry.get()))
+class itemBoxListTab(ttk.Frame):
     
+    boxPageNumber = 0
     
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.itemBoxTree = ttk.Treeview(self,column = ('c1','c2','c3'),show='headings', height=5)
+        self.itemBoxTree.pack(expand=1, fill="both")
+        self.itemBoxTree.column("c1", anchor=tk.CENTER,width=80)
+        self.itemBoxTree.heading("c1", text="Item Number")
+        self.itemBoxTree.column("c2", anchor=tk.W,width=80)
+        self.itemBoxTree.heading("c2", text="Item")
+        self.itemBoxTree.column("c3", anchor=tk.W,width=80)
+        self.itemBoxTree.heading("c3", text="Quantity")
+        
+        self.boxNumber = ttk.Combobox(self, values=list(range(1,11)))
+        self.boxNumber.current(self.boxPageNumber)
+        self.boxNumber.pack()
+        self.boxNumber.bind('<<ComboboxSelected>>', self.changePage)
+        self.itemBoxTree.bind('<Double-Button-1>', self.modifyItem)
+
+
+        parent.add(self, text = 'Item Box List')
+        
+    def changePage(self,a):
+        global itemListUI
+        self.boxPageNumber = self.boxNumber.current()
+        itemListUI = getItemList(self.boxPageNumber)
+        self.updateListboxTree()
+        
+    def updateListboxTree(self):
+        for i in self.itemBoxTree.get_children():
+            self.itemBoxTree.delete(i)
+        index = 1 + (self.boxPageNumber *100)
+        for i in itemListUI:
+            self.itemBoxTree.insert('', 'end', values=(index, i[0], i[1]))
+            index = index + 1
     
-root = tk.Tk()
-root.title('MH3U Save File Editor')
-
-#menus
-menubar = Menu(root)
-fileMenu = Menu(menubar,tearoff =0)
-menubar.add_cascade(label ='File', menu = fileMenu) 
-fileMenu.add_command(label ='Open File', command = openFile) 
-fileMenu.add_command(label ='Save File', command = saveFile) 
-
-
-#tabs
-notebook = ttk.Notebook(root)
-
-#Player into tab
-playerInfoTab = ttk.Frame(notebook)
-notebook.add(playerInfoTab, text='Player Info')
-playerInfoTabCreator(playerInfoTab)
-
-#Item List Box Tab
-listBoxTab = ttk.Frame(notebook)
-notebook.add(listBoxTab, text='Item Box')
-#Create item box and bind to detect changes
-itemBoxTree = itemBoxTreeCreator(listBoxTab)
-itemBoxTree.bind('<Double-Button-1>', modifyItem)
-#create box number chooser and bind to detect changes
-boxNumber = ttk.Combobox(listBoxTab, values=list(range(1,11)))
-boxNumber.current(0)
-boxNumber.pack()
-boxNumber.bind('<<ComboboxSelected>>', changePage)
-
-#Equipment List Box Tab
-equipmentBoxtab = ttk.Frame(notebook)
-notebook.add(equipmentBoxtab, text='Equipment Box')
-#Create item box and bind to detect changes
-equipmentBoxTree = equipmentBoxTreeCreator(equipmentBoxtab)
-equipmentBoxTree.bind('<Double-Button-1>', modifyEquipment)
-eboxNumber = ttk.Combobox(equipmentBoxtab, values=list(range(1,11)))
-eboxNumber.current(0)
-eboxNumber.pack()
-eboxNumber.bind('<<ComboboxSelected>>', echangePage)
-
-
-notebook.pack(expand=1, fill="both")
-root.config(menu = menubar)
-root.geometry("500x300")
-root.mainloop()
+    def modifyItem(self,a):
+        #create popup window
+        self.top = Toplevel(self.parent.parent)
+        #center it on current window placement
+        self.top.geometry("+%d+%d" %(self.parent.parent.winfo_x()+100,self.parent.parent.winfo_y()+100))
+        self.curItem = self.itemBoxTree.focus()
+        self.label1 = Label( self.top, text='Choose Item')
+        self.label2 = Label( self.top, text='Choose Quantity')
+        self.label1.grid(row = 0, column = 0, pady = 2)
+        self.label2.grid(row = 1, column = 0, pady = 2)
+        #Which Item Entry
+        self.itemEntry = ttk.Combobox(self.top, values=getItemListNames())
+        self.itemEntry.current(getItemListNames().index(self.itemBoxTree.item(self.curItem)['values'][1]))
+        self.itemEntry.grid(row = 0, column = 1, pady = 2)
+        #How Many Entry
+        self.quantityEntry = ttk.Combobox(self.top, values=list(range(100)))
+        self.quantityEntry.current(self.itemBoxTree.item(self.curItem)['values'][2])
+        self.quantityEntry.grid(row = 1, column = 1, pady = 2)
+        #Create a Button Widget in the Toplevel Window
+        self.button= Button(self.top, text="Ok", command=lambda:self.itemBoxSubmit(self.top,self.quantityEntry,self.itemEntry,self.curItem))
+        self.button.grid(row = 2, column = 1, pady = 2)
+    
+    def itemBoxSubmit(self,top,quantityEntry,itemEntry,curItem):
+        self.index = self.itemBoxTree.item(curItem)['values'][0]-1
+        #change tree
+        self.itemBoxTree.item(self.curItem, values=(self.itemBoxTree.item(self.curItem)['values'][0], getItemListNames()[self.itemEntry.current()], int(self.quantityEntry.current())))
+        #change itemlist, not sure if strictly necessary but whatever
+        itemListUI[self.index % 100] = (getItemListNames()[self.itemEntry.current()],int(self.quantityEntry.current()))
+        #change overall save data
+        changeItem(self.index,getItemListNames()[self.itemEntry.current()],int(self.quantityEntry.current()))
+        #kill popup
+        self.top.destroy()
+        
+saveEditor()

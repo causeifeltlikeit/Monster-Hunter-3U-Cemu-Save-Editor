@@ -1,8 +1,6 @@
-from data.offsets import *
+from data.globalData import *
 from data.itemCodes import *
 from data.equipmentCodes import *
-
-saveFileData = None
 
 def openSaveFile(fileName):
     global saveFileData
