@@ -31,11 +31,10 @@ def getPlayerName():
 
 
 def getEquipmentList(pageNumber):
-    pageNumber = pageNumber - 1
     tempList = []
     offset = equipmentOffset + (16 * pageNumber * 100) 
     for i in range(pageNumber * 100,(pageNumber * 100)+100):
-        tempList.append((str(equipmentList[(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])].name),(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3])))
+        tempList.append(getEquipmentFromHex(saveFileData[offset],saveFileData[offset+2],saveFileData[offset+3]))
         offset = offset + 16
     return tempList
 

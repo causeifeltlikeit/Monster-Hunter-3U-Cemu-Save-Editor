@@ -3,6 +3,7 @@ import tkinter as tk
 import tkinter.filedialog
 from tkinter import ttk
 itemListUI = []
+equipmentListUI = []
 
 class saveEditor(tk.Tk):
     def __init__(self):
@@ -27,12 +28,14 @@ class fileMenu(tk.Menu):
         
     def openFile(self):
         global itemListUI
+        global equipmentListUI
         filePath = tk.filedialog.askopenfilename(title="Select Save File")
         openSaveFile(filePath)
         itemListUI = getItemList(0)
-
+        equipmentListUI = getEquipmentList(0)
         self.parent.notebook.updatePlayerTab()
         self.parent.notebook.updateListboxTree()
+        self.parent.notebook.updateEquipmentBoxTree()
         
     def saveFile(self):
         saveSaveFile('user2')
@@ -44,6 +47,7 @@ class notebook(ttk.Notebook):
         self.parent = parent
         self.playerInfotab = playerInfoTab(self)
         self.itemBoxListTab = itemBoxListTab(self)
+        self.equipmentBoxListTab = equipmentBoxListTab(self)
         self.pack(expand=1, fill="both")
         
     def updatePlayerTab(self):
@@ -51,6 +55,9 @@ class notebook(ttk.Notebook):
     
     def updateListboxTree(self):
         self.itemBoxListTab.updateListboxTree()
+    
+    def updateEquipmentBoxTree(self):
+        self.equipmentBoxListTab.updateEquipmentBoxTree()
         
 class playerInfoTab(ttk.Frame):
     def __init__(self, parent):
@@ -148,5 +155,41 @@ class itemBoxListTab(ttk.Frame):
         changeItem(self.index,getItemListNames()[self.itemEntry.current()],int(self.quantityEntry.current()))
         #kill popup
         self.top.destroy()
+    
+class equipmentBoxListTab(ttk.Frame):
+    boxPageNumber = 0
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.equipmentBoxTree = ttk.Treeview(self,column = ('c1','c2'),show='headings', height=5)
+        self.equipmentBoxTree.pack(expand=1, fill="both")
+        self.equipmentBoxTree.column("c1", anchor=tk.CENTER,width=80)
+        self.equipmentBoxTree.heading("c1", text="Equipment Number")
+        self.equipmentBoxTree.column("c2", anchor=tk.W,width=80)
+        self.equipmentBoxTree.heading("c2", text="Equipment")
         
+        self.boxNumber = ttk.Combobox(self, values=list(range(1,11)))
+        self.boxNumber.current(self.boxPageNumber)
+        self.boxNumber.pack()
+        self.boxNumber.bind('<<ComboboxSelected>>', self.changePage)
+        #self.itemBoxTree.bind('<Double-Button-1>', self.modifyItem)
+
+
+        parent.add(self, text = 'Equipment Box List')
+        
+    def changePage(self,a):
+        global equipmentListUI
+        self.boxPageNumber = self.boxNumber.current()
+        equipmentListUI = getEquipmentList(self.boxPageNumber)
+        self.updateEquipmentBoxTree()
+        
+    def updateEquipmentBoxTree(self):
+        for i in self.equipmentBoxTree.get_children():
+            self.equipmentBoxTree.delete(i)
+        index = 1 + (self.boxPageNumber *100)
+        for i in equipmentListUI:
+            self.equipmentBoxTree.insert('', 'end', values=(index, i))
+            index = index + 1
+        
+  
 saveEditor()
