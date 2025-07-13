@@ -172,7 +172,6 @@ class equipmentBoxListTab(ttk.Frame):
         self.boxNumber.current(self.boxPageNumber)
         self.boxNumber.pack()
         self.boxNumber.bind('<<ComboboxSelected>>', self.changePage)
-        #self.itemBoxTree.bind('<Double-Button-1>', self.modifyItem)
 
 
         parent.add(self, text = 'Equipment Box List')
@@ -192,4 +191,6 @@ class equipmentBoxListTab(ttk.Frame):
             index = index + 1
         
   
+
+
 saveEditor()
